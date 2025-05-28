@@ -12,12 +12,6 @@ size = 15.0
 [terminal]
 shell = "/bin/zsh"
 
-[keyboard]
-bindings = [
-  { key = "+", mods = "Control", action = "IncreaseFontSize" },
-  { key = "-", mods = "Control", action = "DecreaseFontSize" }
-]
-
 [mouse]
 hide_when_typing = true  # Auto-hide cursor while typing
 
