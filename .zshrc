@@ -6,20 +6,23 @@ PS1="%{$(tput setaf 48)%}%~%{$(tput sgr0)%} "
 alias ls='ls -a --color=auto'
 alias grep='grep --color=auto'
 
-# History in cache directory
+# Set history file path first
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE=~/.cache/zsh/history
+
+# Make sure history directory exists
 if [ ! -d "$(dirname $HISTFILE)" ]; then
   mkdir -p "$(dirname $HISTFILE)"
 fi
 
-setopt APPEND_HISTORY             # Append rather than overwrite history
-setopt INC_APPEND_HISTORY         # Write to history immediately, not at shell exit
-setopt SHARE_HISTORY              # Share history across all sessions
-setopt HIST_IGNORE_DUPS           # Ignore duplicate commands
-setopt HIST_REDUCE_BLANKS         # Remove superfluous blanks
+# Set Zsh history options
+setopt APPEND_HISTORY
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_REDUCE_BLANKS
 
-HISTSIZE=10000
-SAVEHIST=10000
-HISTFILE=~/.cache/zsh/history
 
 # Autocomplete
 autoload -U compinit
