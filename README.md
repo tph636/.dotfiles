@@ -7,6 +7,7 @@ Each package directory in this repo must mirror the structure of the home direct
 
 - Stow (https://www.gnu.org/software/stow/manual/stow.html)
 - Optional: `zsh`
+- Optional: `fzf`
 
 
 ## Usage
