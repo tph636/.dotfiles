@@ -1,43 +1,62 @@
-# Theme
+###############################################
+# Colors + Prompt
+###############################################
 autoload -U colors && colors
 PS1="%{$(tput setaf 48)%}%~%{$(tput sgr0)%} "
 
+###############################################
 # Aliases
-alias ls='ls -a --color=auto'
+###############################################
+alias ls='ls --color=auto'
 alias grep='grep --color=auto'
-# alias for hist to show history in easily searchable format
+
+###############################################
+# fzf-powered history search (prefix-only, no duplicates)
+###############################################
 hist() {
-  local selected
-  selected=$(fc -l 1 | tac | sed 's/^[[:space:]]*[0-9]\+[[:space:]]*//' | fzf --no-sort --height 40%)
+  local prefix selected
+  prefix=$LBUFFER
+
+  selected=$(
+    fc -l 1 \
+    | tac \
+    | sed 's/^[[:space:]]*[0-9]\+[[:space:]]*//' \
+    | awk '!seen[$0]++' \
+    | grep -E "^${prefix//\//\\/}" \
+    | fzf --no-sort --height 40% --query="$prefix" --select-1 --exit-0
+  )
+
   [[ -n "$selected" ]] && print -z -- "$selected"
 }
 zle -N hist
 bindkey '^R' hist
 
-
-# Set history file path first
+###############################################
+# History settings (no duplicates)
+###############################################
 HISTSIZE=10000
 SAVEHIST=10000
 HISTFILE=~/.cache/zsh/history
 
-# Make sure history directory exists
+# Ensure directory exists
 if [ ! -d "$(dirname $HISTFILE)" ]; then
   mkdir -p "$(dirname $HISTFILE)"
 fi
 
-# Set Zsh history options
 setopt APPEND_HISTORY
 setopt INC_APPEND_HISTORY
-setopt SHARE_HISTORY
+unsetopt SHARE_HISTORY
 setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_SAVE_NO_DUPS
 setopt HIST_REDUCE_BLANKS
 
-
+###############################################
 # Autocomplete
+###############################################
 autoload -U compinit
 zstyle ':completion:*' menu select
 zmodload zsh/complist
 compinit
-_comp_options+=(globdots)  # Include hidden files
+comp_options+=(globdots)
+

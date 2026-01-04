@@ -1,0 +1,88 @@
+###############################################
+# Colors + Prompt Styling
+###############################################
+# Enable colors
+if command -v tput >/dev/null 2>&1; then
+    BLUE_BG=$(tput setaf 48)
+    RESET=$(tput sgr0)
+else
+    BLUE_BG=""
+    RESET=""
+fi
+
+# Match your zsh-style prompt: blue-ish color + current directory
+PS1="${BLUE_BG}\w${RESET} "
+
+###############################################
+# Aliases
+###############################################
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+
+###############################################
+# fzf-powered prefix-only history search
+###############################################
+
+# Bind Ctrl-R to our custom search
+bind -x '"\C-r": fzf_history_search'
+
+fzf_history_search() {
+    local prefix
+    prefix="${READLINE_LINE:0:READLINE_POINT}"
+
+    local selected
+    selected=$(
+        history \
+        | sed 's/^[ ]*[0-9]\+[ ]*//' \
+        | tac \
+        | awk '!seen[$0]++' \
+        | grep -E "^${prefix//\//\\/}" \
+        | fzf --height 40% --no-sort \
+              --query="$prefix" \
+              --select-1 --exit-0 \
+              --exact
+    )
+
+    if [[ -n "$selected" ]]; then
+        READLINE_LINE="$selected"
+        READLINE_POINT=${#selected}
+    fi
+}
+
+h() {
+	fzf_history_search
+}
+
+###############################################
+# Bash history settings (no duplicates)
+###############################################
+HISTSIZE=10000
+HISTFILESIZE=10000
+HISTCONTROL=ignoredups:erasedups
+shopt -s histappend
+
+###############################################
+# Ensure history file exists
+###############################################
+HISTFILE="$HOME/.bash_history"
+touch "$HISTFILE"
+
+###############################################
+# Bash completion (if available)
+###############################################
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+elif [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+fi
+
+###############################################
+# fzf integration (if installed)
+###############################################
+if command -v fzf >/dev/null 2>&1; then
+    # Load fzf keybindings if available
+    if [ -f ~/.fzf.bash ]; then
+        . ~/.fzf.bash
+    fi
+fi
+
