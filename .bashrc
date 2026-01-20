@@ -1,5 +1,5 @@
 ###############################################
-# Colors + Prompt Styling
+# Prompt
 ###############################################
 # Enable colors
 if command -v tput >/dev/null 2>&1; then
@@ -16,15 +16,24 @@ PS1="${BLUE_BG}\w${RESET} "
 ###############################################
 # Aliases
 ###############################################
-alias ls='ls --color=auto'
-alias grep='grep --color=auto'
+alias ls="ls --color=auto"
+alias grep="grep --color=auto"
+alias whoami="whoami && curl ident.me"
+alias dc="docker compose up --build -d"
+alias gs="git status"
+alias gl="git log"
+alias gb='git branch'
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias py="python3"
 
 ###############################################
-# fzf-powered prefix-only history search
+# fzf-powered history search
 ###############################################
 
-# Bind Ctrl-R to our custom search
-bind -x '"\C-r": fzf_history_search'
+# Bind Ctrl-R to search
+bind -x '"\C-h": fzf_history_search'
 
 fzf_history_search() {
     local prefix
@@ -49,9 +58,6 @@ fzf_history_search() {
     fi
 }
 
-h() {
-	fzf_history_search
-}
 
 ###############################################
 # Bash history settings (no duplicates)
