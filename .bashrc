@@ -1,17 +1,7 @@
 ###############################################
 # Prompt
 ###############################################
-# Enable colors
-if command -v tput >/dev/null 2>&1; then
-    BLUE_BG=$(tput setaf 48)
-    RESET=$(tput sgr0)
-else
-    BLUE_BG=""
-    RESET=""
-fi
-
-# Match your zsh-style prompt: blue-ish color + current directory
-PS1="${BLUE_BG}\w${RESET} "
+PS1='\[\e[38;5;34;1m\]\w\n\[\e[0m\]'
 
 ###############################################
 # Aliases
