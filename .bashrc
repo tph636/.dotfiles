@@ -9,20 +9,21 @@ PS1='\[\e[38;5;34;1m\]\w\n\[\e[0m\]'
 alias ls="ls --color=auto"
 alias grep="grep --color=auto"
 alias whoami="whoami && curl ident.me"
-alias dc="docker compose up --build -d"
-alias gs="git status"
-alias gl="git log"
-alias gb='git branch'
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
-alias py="python3"
+cd() {
+  builtin cd "$@" && ls
+}
+mkcd() {
+  mkdir -p -- "$1" && cd -- "$1"
+}
 
 ###############################################
 # fzf-powered history search
 ###############################################
 
-# Bind Ctrl-R to search
+# Bind Ctrl-h to search
 bind -x '"\C-h": fzf_history_search'
 
 fzf_history_search() {
@@ -48,7 +49,6 @@ fzf_history_search() {
     fi
 }
 
-
 ###############################################
 # Bash history settings (no duplicates)
 ###############################################
@@ -57,20 +57,8 @@ HISTFILESIZE=10000
 HISTCONTROL=ignoredups:erasedups
 shopt -s histappend
 
-###############################################
-# Ensure history file exists
-###############################################
 HISTFILE="$HOME/.bash_history"
 touch "$HISTFILE"
-
-###############################################
-# Bash completion (if available)
-###############################################
-if [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-elif [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-fi
 
 ###############################################
 # fzf integration (if installed)
@@ -82,3 +70,7 @@ if command -v fzf >/dev/null 2>&1; then
     fi
 fi
 
+###############################################
+# PATH
+###############################################
+export PATH="$HOME/.local/bin:$PATH"
