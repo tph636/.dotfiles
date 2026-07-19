@@ -20,12 +20,9 @@ mkcd() {
 }
 
 ###############################################
-# fzf-powered history search
+# fzf history search
 ###############################################
-
-# Bind Ctrl-h to search
 bind -x '"\C-h": fzf_history_search'
-
 fzf_history_search() {
     local prefix
     prefix="${READLINE_LINE:0:READLINE_POINT}"
@@ -50,13 +47,30 @@ fzf_history_search() {
 }
 
 ###############################################
+# fzf git switch 
+###############################################
+gsb() {
+    local branch
+    branch=$(
+        git for-each-ref \
+            --sort=-committerdate \
+            --format='‰(refname:short)' refs/geads/ |
+            fzf \
+                --prompt="Switch to branch: " \
+                --height=50% \
+                --reverse
+                --preview 'git log --oneline --decorate --color=always -n 15 {}'
+    ) || return
+    [[ -n "$branch" ]] && git switch "$branch"
+}
+
+###############################################
 # Bash history settings (no duplicates)
 ###############################################
 HISTSIZE=10000
 HISTFILESIZE=10000
 HISTCONTROL=ignoredups:erasedups
 shopt -s histappend
-
 HISTFILE="$HOME/.bash_history"
 touch "$HISTFILE"
 
@@ -64,10 +78,7 @@ touch "$HISTFILE"
 # fzf integration (if installed)
 ###############################################
 if command -v fzf >/dev/null 2>&1; then
-    # Load fzf keybindings if available
-    if [ -f ~/.fzf.bash ]; then
-        . ~/.fzf.bash
-    fi
+    eval "$(fzf --bash)"
 fi
 
 ###############################################
