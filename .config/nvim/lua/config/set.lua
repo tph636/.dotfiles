@@ -18,8 +18,4 @@ vim.opt.smartcase = true
 
 vim.opt.termguicolors = true
 
--- Allow updating buffer when another program edits it:
 vim.opt.autoread = true
-vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
-  command = "checktime",
-})
