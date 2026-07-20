@@ -19,3 +19,4 @@ vim.opt.smartcase = true
 vim.opt.termguicolors = true
 
 vim.opt.autoread = true
+vim.opt.swapfile = false
