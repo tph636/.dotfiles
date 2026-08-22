@@ -3,8 +3,8 @@
  *
  * Claude Code style approval gate for bash commands:
  *   - Every bash command needs approval before it runs.
- *   - Approving a command can also add it to a persisted allowlist so it
- *     never has to be approved again.
+ *   - The persisted allowlist is managed explicitly via /approve add|remove,
+ *     not from the inline approval prompt.
  *   - An "auto-accept" mode can be toggled on to skip prompts entirely
  *     for the rest of the session (like Claude Code's auto-accept mode).
  *
@@ -91,19 +91,12 @@ export default function (pi: ExtensionAPI) {
 
 		const choice = await ctx.ui.select(`Run command?\n\n  ${command}`, [
 			"Yes",
-			"Yes, always allow this command",
 			"Yes, auto-accept all commands for this session",
 			"No",
 		]);
 
 		switch (choice) {
 			case "Yes":
-				return undefined;
-
-			case "Yes, always allow this command":
-				store.allow.push(command);
-				await saveStore(store);
-				ctx.ui.notify(`Added to allowlist: ${command}`, "info");
 				return undefined;
 
 			case "Yes, auto-accept all commands for this session":
@@ -128,7 +121,6 @@ pi.on("keypress", async (event, ctx) => {
 	// Define approval options
 	const options = [
 		"Yes",
-		"Yes, always allow this command",
 		"Yes, auto-accept all commands for this session",
 		"No"
 	];
@@ -148,11 +140,6 @@ pi.on("keypress", async (event, ctx) => {
 		switch (nextOption) {
 			case "Yes":
 				// Command will be executed
-				break;
-			case "Yes, always allow this command":
-				store.allow.push(currentCommand);
-				await saveStore(store);
-				ctx.ui.notify(`Added to allowlist: ${currentCommand}`, "info");
 				break;
 			case "Yes, auto-accept all commands for this session":
 				autoAccept = true;
