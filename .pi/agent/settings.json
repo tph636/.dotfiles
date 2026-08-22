@@ -2,7 +2,9 @@
   "lastChangelogVersion": "0.84.2",
   "theme": "dark",
   "defaultProvider": "mistral",
-  "defaultModel": "mistral-medium-2505",
-  "defaultThinkingLevel": "medium",
-  "packages": []
+  "defaultModel": "magistral-medium-latest",
+  "defaultThinkingLevel": "off",
+  "packages": [
+    "npm:pi-web-access"
+  ]
 }

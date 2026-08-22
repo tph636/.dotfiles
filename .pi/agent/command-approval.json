@@ -1,3 +1,9 @@
 {
-  "allow": []
+  "allow": [
+    "git diff\\b",
+    "git status\\b",
+    "ls\\b",
+    "grep\\b",
+    "find\\b"
+  ]
 }

@@ -1,3 +1,5 @@
 .pi/agent/models-store.json
 .pi/agent/auth.json
 .pi/agent/sessions/
+.pi/agent/trust.json
+node_modules/

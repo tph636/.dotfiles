@@ -8,8 +8,10 @@
  *   - An "auto-accept" mode can be toggled on to skip prompts entirely
  *     for the rest of the session (like Claude Code's auto-accept mode).
  *
- * Allowlist entries are exact command strings, or a command string ending
- * in "*" to match by prefix (e.g. "git status*").
+ * Allowlist entries are JavaScript regular expressions matched against the
+ * full command string. A "^" is implied at the start if not already present,
+ * so entries read as prefix matches by default (e.g. "git status" allows
+ * any "git status ..." invocation); write "^...$" for a full-string match.
  *
  * State is stored globally in the pi agent config dir so it applies across
  * all projects: <agentDir>/command-approval.json
@@ -26,11 +28,23 @@ interface Store {
 	allow: string[];
 }
 
+const regexCache = new Map<string, RegExp | null>();
+
+function compilePattern(pattern: string): RegExp | null {
+	if (regexCache.has(pattern)) return regexCache.get(pattern)!;
+	const source = pattern.startsWith("^") ? pattern : `^${pattern}`;
+	let regex: RegExp | null;
+	try {
+		regex = new RegExp(source);
+	} catch {
+		regex = null;
+	}
+	regexCache.set(pattern, regex);
+	return regex;
+}
+
 function matchesAllowlist(command: string, allow: string[]): boolean {
-	return allow.some((pattern) => {
-		if (pattern.endsWith("*")) return command.startsWith(pattern.slice(0, -1));
-		return command === pattern;
-	});
+	return allow.some((pattern) => compilePattern(pattern)?.test(command) ?? false);
 }
 
 async function loadStore(): Promise<Store> {
@@ -103,7 +117,55 @@ export default function (pi: ExtensionAPI) {
 		}
 	});
 
-	pi.registerCommand("approve", {
+	// Add keybinding handler for Shift+Tab
+pi.on("keypress", async (event, ctx) => {
+	if (event.key !== "Tab" || !event.shiftKey) return;
+	
+	// Get the current command from the UI
+	const currentCommand = ctx.ui.getCurrentCommand?.();
+	if (!currentCommand) return;
+	
+	// Define approval options
+	const options = [
+		"Yes",
+		"Yes, always allow this command",
+		"Yes, auto-accept all commands for this session",
+		"No"
+	];
+	
+	// Cycle through options
+	const currentOption = ctx.ui.getStatus(STATUS_KEY) || "";
+	const currentIndex = options.indexOf(currentOption);
+	const nextIndex = (currentIndex + 1) % options.length;
+	const nextOption = options[nextIndex];
+	
+	// Update status and notify user
+	ctx.ui.setStatus(STATUS_KEY, nextOption);
+	ctx.ui.notify(`Approval option: ${nextOption}`, "info");
+	
+	// If user selects an option, handle it
+	if (nextOption !== "") {
+		switch (nextOption) {
+			case "Yes":
+				// Command will be executed
+				break;
+			case "Yes, always allow this command":
+				store.allow.push(currentCommand);
+				await saveStore(store);
+				ctx.ui.notify(`Added to allowlist: ${currentCommand}`, "info");
+				break;
+			case "Yes, auto-accept all commands for this session":
+				autoAccept = true;
+				setStatus(ctx);
+				ctx.ui.notify("Auto-accept enabled for this session", "warning");
+				break;
+			case "No":
+				return { block: true, reason: "Blocked by user" };
+		}
+	}
+});
+
+pi.registerCommand("approve", {
 		description: "Manage command approval: list | add <cmd> | remove <cmd> | auto <on|off>",
 		getArgumentCompletions: (prefix) => {
 			const subcommands = ["list", "add", "remove", "auto"];
@@ -173,4 +235,6 @@ export default function (pi: ExtensionAPI) {
 			}
 		},
 	});
+	
+	// Rest of the keypress handler code...
 }
