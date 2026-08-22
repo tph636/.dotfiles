@@ -152,16 +152,25 @@ pi.on("keypress", async (event, ctx) => {
 	}
 });
 
+pi.registerCommand("auto", {
+		description: "Toggle auto-accept mode for command approval",
+		handler: async (_args, ctx) => {
+			autoAccept = !autoAccept;
+			setStatus(ctx);
+			ctx.ui.notify(`Auto-accept ${autoAccept ? "enabled" : "disabled"} for this session`, "info");
+		},
+	});
+
 pi.registerCommand("approve", {
-		description: "Manage command approval: list | add <cmd> | remove <cmd> | auto <on|off>",
+		description: "Manage command approval: list | add <cmd> | remove <cmd>",
 		getArgumentCompletions: (prefix) => {
-			const subcommands = ["list", "add", "remove", "auto"];
+			const subcommands = ["list", "add", "remove"];
 			const items = subcommands.filter((s) => s.startsWith(prefix)).map((value) => ({ value, label: value }));
 			return items.length > 0 ? items : null;
 		},
 		handler: async (args, ctx) => {
 			const trimmed = args.trim();
-			const [sub, ...rest] = trimmed.split(/\s+/);
+			const [sub] = trimmed.split(/\s+/);
 			const restArg = trimmed.slice(sub?.length ?? 0).trim();
 
 			switch (sub) {
@@ -194,18 +203,6 @@ pi.registerCommand("approve", {
 					return;
 				}
 
-				case "auto": {
-					const arg = rest.join(" ").trim().toLowerCase();
-					if (arg !== "on" && arg !== "off") {
-						ctx.ui.notify("Usage: /approve auto <on|off>", "warning");
-						return;
-					}
-					autoAccept = arg === "on";
-					setStatus(ctx);
-					ctx.ui.notify(`Auto-accept ${autoAccept ? "enabled" : "disabled"} for this session`, "info");
-					return;
-				}
-
 				case "list":
 				case "": {
 					const lines = [
@@ -218,7 +215,7 @@ pi.registerCommand("approve", {
 				}
 
 				default:
-					ctx.ui.notify("Usage: /approve list | add <cmd> | remove <cmd> | auto <on|off>", "warning");
+					ctx.ui.notify("Usage: /approve list | add <cmd> | remove <cmd>", "warning");
 			}
 		},
 	});
