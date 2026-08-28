@@ -3,11 +3,11 @@
 Dotfiles managed using stow.
 Each package directory in this repo must mirror the structure of the home directory.
 
-## Requirements
+## Installs
 
-- Stow (https://www.gnu.org/software/stow/manual/stow.html)
-- Optional: `zsh`
-- Optional: `fzf`
+- `stow` (https://www.gnu.org/software/stow/manual/stow.html)
+- `fzf`
+- `nvim`
 
 
 ## Usage
@@ -15,3 +15,6 @@ Each package directory in this repo must mirror the structure of the home direct
 To apply dotfiles, run the following from inside the `dotfiles` directory:
 ```bash
 stow --adopt .
+```
+
+environment variables in ~/.env as `"export envar="abc""`

@@ -85,4 +85,8 @@ fi
 # PATH
 ###############################################
 export PATH="$HOME/.local/bin:$PATH"
-[ -f ~/.env ] && . ~/.env
+if [ -f ~/.env ]; then
+  set -a
+  . ~/.env
+  set +a
+fi

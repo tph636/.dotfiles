@@ -1,10 +1,4 @@
 {
-  "lastChangelogVersion": "0.84.2",
-  "theme": "dark",
-  "defaultProvider": "mistral",
-  "defaultModel": "magistral-medium-latest",
-  "defaultThinkingLevel": "off",
-  "packages": [
-    "npm:pi-web-access"
-  ]
+  "lastChangelogVersion": "0.84.3",
+  "theme": "dark"
 }
