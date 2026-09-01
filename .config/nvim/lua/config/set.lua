@@ -10,6 +10,8 @@ vim.opt.relativenumber = true
 vim.opt.signcolumn = "yes"
 vim.opt.cursorline = true
 vim.opt.scrolloff = 8
+vim.opt.list = true
+vim.opt.listchars = { trail = '·', tab = '»·' }
 
 vim.opt.hlsearch = true
 vim.opt.incsearch = true

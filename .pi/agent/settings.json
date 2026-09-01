@@ -1,4 +1,10 @@
 {
-  "lastChangelogVersion": "0.84.3",
-  "theme": "dark"
+  "lastChangelogVersion": "0.84.4",
+  "theme": "dark",
+  "defaultProvider": "mistral",
+  "defaultModel": "zai-glm-5-2",
+  "defaultThinkingLevel": "off",
+  "packages": [
+    "npm:pi-web-access"
+  ]
 }

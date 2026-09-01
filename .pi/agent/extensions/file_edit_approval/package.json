@@ -1,0 +1,11 @@
+{
+  "name": "file_edit_approval",
+  "version": "1.0.0",
+  "description": "Session-specific approval gate for file edits/writes (no hardcoded allowlist).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "type": "commonjs"
+}
