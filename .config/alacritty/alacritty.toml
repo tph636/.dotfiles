@@ -1,4 +1,7 @@
 
+[window]
+padding = { x = 8, y = 8 }
+
 [[keyboard.bindings]]
 key = "Return"
 mods = "Shift"
