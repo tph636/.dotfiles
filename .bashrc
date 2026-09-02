@@ -26,22 +26,12 @@ mkdir() {
 pi() {
   local git_bind=()
   [ -d "$PWD/.git" ] && git_bind=(--ro-bind "$PWD/.git" "$PWD/.git")
-
-  # ~/.pi/agent contains symlinks that resolve (via ../../) to ~/.dotfiles/.pi,
-  # so that directory must be visible inside the sandbox too.
-  local dotpi_bind=()
-  [ -d "$HOME/.dotfiles/.pi" ] && dotpi_bind=(--ro-bind "$HOME/.dotfiles/.pi" "$HOME/.dotfiles/.pi")
-
-  # Node lives in /usr/bin on this host (no nvm). Resolve it so the PATH stays correct.
   local node_bin
   node_bin="$(dirname "$(readlink -f "$(command -v node)")")"
-
-  # The host nsswitch.conf forces systemd-resolved, which can't run in the sandbox.
-  # Use a per-run minimal nsswitch.conf (files dns) so classic /etc/resolv.conf DNS works.
   local nss_dir
   nss_dir="$(mktemp -d)" && printf 'hosts: files dns\n' > "$nss_dir/nsswitch.conf"
   trap 'rm -rf "$nss_dir"' RETURN INT TERM
-
+  
   bwrap \
     --unshare-pid \
     --die-with-parent \
@@ -54,19 +44,21 @@ pi() {
     --ro-bind "$nss_dir/nsswitch.conf" /etc/nsswitch.conf \
     --ro-bind /etc/hosts /etc/hosts \
     --ro-bind /etc/ssl /etc/ssl \
-    --ro-bind /etc/ca-certificates /etc/ca-certificates \
+    --ro-bind /etc/pki /etc/pki \
+    --ro-bind /etc/crypto-policies /etc/crypto-policies \
     --proc /proc \
     --dev /dev \
     --tmpfs /tmp \
     --dir /home \
+    --dir "$HOME" \
     --bind "$PWD" "$PWD" \
     "${git_bind[@]}" \
-    --bind "$HOME/.pi" "$HOME/.pi" \
-    --ro-bind "$HOME/.pi/agent/auth.json" "$HOME/.pi/agent/auth.json" \
-    "${dotpi_bind[@]}" \
+    --bind "$HOME/.dotfiles/.pi" "$HOME/.dotfiles/.pi" \
+    --ro-bind "$HOME/.dotfiles/.pi/agent/auth.json" "$HOME/.dotfiles/.pi/agent/auth.json" \
     --clearenv --setenv HOME "$HOME" \
-    --setenv PATH "$node_bin:/usr/bin:/bin" \
-    -- pi "$@"
+    --setenv PI_CODING_AGENT_DIR "$HOME/.dotfiles/.pi/agent" \
+    --setenv PATH "$node_bin:/usr/local/bin:/usr/bin:/bin" \
+    -- "$(readlink -f /usr/local/bin/pi)" "$@"
 }
 
 ###############################################
