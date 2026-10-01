@@ -1,0 +1,20 @@
+{
+  "providers": {
+    "google": {
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+      "api": "google-generative-ai",
+      "apiKey": "mock-gemini-key",
+      "models": [
+        {
+          "id": "gemini-3-pro-mock",
+          "name": "Gemini 3 Pro (mock)",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 1048576,
+          "maxTokens": 65536,
+          "cost": { "input": 1.25, "output": 10, "cacheRead": 0.31, "cacheWrite": 0 }
+        }
+      ]
+    }
+  }
+}
