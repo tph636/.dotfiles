@@ -15,7 +15,7 @@ alias ....="cd ../../.."
 cd() {
   builtin cd "$@" && ls
 }
-mkdir() {
+mkd() {
   command mkdir -p -- "$1" && cd -- "$1"
 }
 
